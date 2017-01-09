@@ -26,6 +26,8 @@
 #include "tgbot/TgException.h"
 #include "tgbot/net/HttpClient.h"
 
+#include <iostream>
+
 using namespace std;
 using namespace boost::property_tree;
 
@@ -38,8 +40,8 @@ User::Ptr Api::getMe() const {
 	return TgTypeParser::getInstance().parseJsonAndGetUser(sendRequest("getMe"));
 }
 
-Message::Ptr Api::sendMessage(int64_t chatId, const string& text, bool disableWebPagePreview, int32_t replyToMessageId, const GenericReply::Ptr& replyMarkup, const string& parseMode, bool disableNotification) const {
-	vector<HttpReqArg> args;
+Message::Ptr Api::sendMessageAsync(int64_t chatId, const string& text, bool disableWebPagePreview, int32_t replyToMessageId, const GenericReply::Ptr& replyMarkup, const string& parseMode, bool disableNotification) const {
+  vector<HttpReqArg> args;
 	args.push_back(HttpReqArg("chat_id", chatId));
 	args.push_back(HttpReqArg("text", text));
 	if (disableWebPagePreview) {
@@ -57,7 +59,14 @@ Message::Ptr Api::sendMessage(int64_t chatId, const string& text, bool disableWe
 	if (!parseMode.empty()) {
 		args.push_back(HttpReqArg("parse_mode", parseMode));
 	}
-	return TgTypeParser::getInstance().parseJsonAndGetMessage(sendRequest("sendMessage", args));
+  Message::Ptr reply(nullptr);
+//  try {
+//    reply = TgTypeParser::getInstance().parseJsonAndGetMessage(sendRequest("sendMessage", args));
+//  } catch (TgException& ) {
+
+//  }
+  sendAsyncRequest("sendMessage", args);
+  return reply;
 }
 
 Message::Ptr Api::forwardMessage(int64_t chatId, int64_t fromChatId, int32_t messageId, bool disableNotification) const {
@@ -659,7 +668,7 @@ bool Api::unbanChatMember(int64_t chatId, int32_t userId) const {
 
 ptree Api::sendRequest(const string& method, const vector<HttpReqArg>& args) const {
 
-	string url = "https://api.telegram.org/bot";
+  string url = "https://api.telegram.org/bot";
 	url += _token;
 	url += "/";
 	url += method;
@@ -679,6 +688,16 @@ ptree Api::sendRequest(const string& method, const vector<HttpReqArg>& args) con
 	} catch (boost::property_tree::ptree_error& e) {
 		throw TgException("tgbot-cpp library can't parse json response. " + string(e.what()));
 	}
+}
+
+void Api::sendAsyncRequest(const string& method, const vector<HttpReqArg>& args) const {
+
+  string url = "https://api.telegram.org/bot";
+  url += _token;
+  url += "/";
+  url += method;
+
+  HttpClient::getInstance().makeAsyncRequest(url, args);
 }
 
 }

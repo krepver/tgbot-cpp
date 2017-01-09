@@ -26,30 +26,31 @@
 #include "tgbot/Bot.h"
 #include "tgbot/EventHandler.h"
 #include "tgbot/TgTypeParser.h"
-#include "tgbot/net/HttpServer.h"
+#include "simple-web-server/server_https.hpp"
+#include <boost/asio/io_service.hpp>
 
 namespace TgBot {
 
-template<typename Protocol>
-class TgWebhookServer : public HttpServer<Protocol> {
+class TgWebhookServer {
 
 public:
-	TgWebhookServer(std::shared_ptr<boost::asio::basic_socket_acceptor<Protocol>> acceptor, const typename HttpServer<Protocol>::ServerHandler& handler) = delete;
+  TgWebhookServer(const std::string& publicKey,
+                  const std::string& privateKey,
+                  std::shared_ptr<boost::asio::io_service>& service,
+                  int port,
+                  const std::string& path,
+                  const EventHandler* eventHandler);
 
-	TgWebhookServer(std::shared_ptr<boost::asio::basic_socket_acceptor<Protocol>> acceptor, const std::string& path, const EventHandler* eventHandler) :
-		HttpServer<Protocol>(acceptor, [this, eventHandler, &path](const std::string& data, const std::map<std::string, std::string>& headers) -> std::string {
-			if (headers.at("method") == "POST" && headers.at("path") == path) {
-				eventHandler->handleUpdate(TgTypeParser::getInstance().parseJsonAndGetUpdate(TgTypeParser::getInstance().parseJson(data)));
-			}
-			return HttpParser::getInstance().generateResponse("");
-		})
-	{
-	}
+  void stop();
 
-	TgWebhookServer(std::shared_ptr<boost::asio::basic_socket_acceptor<Protocol>> acceptor, const std::string& path, const Bot& bot) :
-		TgWebhookServer(acceptor, path, &bot.getEventHandler())
-	{
-	}
+
+//  eventHandler->handleUpdate(TgTypeParser::getInstance().parseJsonAndGetUpdate(TgTypeParser::getInstance().parseJson(data)));
+//  return HttpParser::getInstance().generateResponse("");
+
+private:
+  typedef SimpleWeb::Server<SimpleWeb::HTTPS> HttpsServer;
+  HttpsServer _server;
+  const EventHandler* _handler;
 };
 
 }

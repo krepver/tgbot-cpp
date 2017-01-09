@@ -57,11 +57,8 @@
 #include "tgbot/net/HttpClient.h"
 #include "tgbot/net/HttpParser.h"
 #include "tgbot/net/HttpReqArg.h"
-#include "tgbot/net/HttpServer.h"
 #include "tgbot/net/TgLongPoll.h"
-#include "tgbot/net/TgWebhookLocalServer.h"
 #include "tgbot/net/TgWebhookServer.h"
-#include "tgbot/net/TgWebhookTcpServer.h"
 #include "tgbot/net/Url.h"
 
 /**

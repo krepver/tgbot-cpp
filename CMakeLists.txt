@@ -6,17 +6,25 @@ option(ENABLE_TESTS "Set to ON to enable building of tests" OFF)
 
 ### sources
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+FILE(GLOB_RECURSE LibFiles "include/*.h")
+add_custom_target(headers SOURCES ${LibFiles})
+
 include_directories(include)
+
 set(SRC_LIST
     src/Api.cpp
     src/TgTypeParser.cpp
     src/TgException.cpp
     src/net/Url.cpp
     src/net/HttpClient.cpp
+    src/net/TgWebhookServer.cpp
     src/net/HttpParser.cpp
     src/net/TgLongPoll.cpp
     src/tools/StringTools.cpp
         src/types/InlineQueryResult.cpp)
+
+
 
 ### libs
 # threads

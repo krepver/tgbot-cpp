@@ -75,7 +75,7 @@ public:
 	 * @param disableNotification Optional. Sends the message silenty.
 	 * @return On success, the sent message is returned.
 	 */
-	Message::Ptr sendMessage(int64_t chatId, const std::string& text, bool disableWebPagePreview = false, int32_t replyToMessageId = 0, const GenericReply::Ptr& replyMarkup = GenericReply::Ptr(), const std::string& parseMode = "", bool disableNotification = false) const;
+  Message::Ptr sendMessageAsync(int64_t chatId, const std::string& text, bool disableWebPagePreview = false, int32_t replyToMessageId = 0, const GenericReply::Ptr& replyMarkup = GenericReply::Ptr(), const std::string& parseMode = "", bool disableNotification = false) const;
 
 	/**
 	 * Use this method to forward messages of any kind.
@@ -477,6 +477,7 @@ public:
 
 private:
 	boost::property_tree::ptree sendRequest(const std::string& method, const std::vector<HttpReqArg>& args = std::vector<HttpReqArg>()) const;
+  void sendAsyncRequest(const std::string& method, const std::vector<HttpReqArg>& args = std::vector<HttpReqArg>()) const;
 
 	const std::string _token;
 };
