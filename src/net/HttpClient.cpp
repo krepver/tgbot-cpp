@@ -104,12 +104,12 @@ void HttpClient::makeAsyncRequest(const Url& url, const vector<HttpReqArg>& args
           char* buff = new char[1024];
           socket->async_read_some(buffer(buff, 1024), [buff, socket](const boost::system::error_code& e,
                      std::size_t ){
+            delete[] buff;
             if (e) {
 //              cout << "async_read: " << e.value() << " - " << e.message() << endl;
               return;
             }
 //            cout << "async_read: ok" << endl;
-            delete[] buff;
             socket->async_shutdown([socket](const boost::system::error_code& erro){
               if (erro) {
 //                if ((erro.category() == boost::asio::error::get_ssl_category())
