@@ -69,6 +69,35 @@ Message::Ptr Api::sendMessageAsync(int64_t chatId, const string& text, bool disa
   return reply;
 }
 
+Message::Ptr Api::sendMessage(int64_t chatId, const string& text, bool disableWebPagePreview, int32_t replyToMessageId, const GenericReply::Ptr& replyMarkup, const string& parseMode, bool disableNotification) const {
+  vector<HttpReqArg> args;
+  args.push_back(HttpReqArg("chat_id", chatId));
+  args.push_back(HttpReqArg("text", text));
+  if (disableWebPagePreview) {
+    args.push_back(HttpReqArg("disable_web_page_preview", disableWebPagePreview));
+  }
+  if (disableNotification){
+    args.push_back(HttpReqArg("disable_notification", disableNotification));
+  }
+  if (replyToMessageId) {
+    args.push_back(HttpReqArg("reply_to_message_id", replyToMessageId));
+  }
+  if (replyMarkup) {
+    args.push_back(HttpReqArg("reply_markup", TgTypeParser::getInstance().parseGenericReply(replyMarkup)));
+  }
+  if (!parseMode.empty()) {
+    args.push_back(HttpReqArg("parse_mode", parseMode));
+  }
+  Message::Ptr reply(nullptr);
+//  try {
+//    reply = TgTypeParser::getInstance().parseJsonAndGetMessage(sendRequest("sendMessage", args));
+//  } catch (TgException& ) {
+
+//  }
+  sendRequest("sendMessage", args);
+  return reply;
+}
+
 Message::Ptr Api::forwardMessage(int64_t chatId, int64_t fromChatId, int32_t messageId, bool disableNotification) const {
 	vector<HttpReqArg> args;
 	args.push_back(HttpReqArg("chat_id", chatId));
